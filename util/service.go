@@ -132,11 +132,7 @@ func GetStartAndEndTime(timestamp string, sec int) (int64, int64) {
 func ConvertResultJsonForGitHubAction(byteValue []byte) (*TestResults, error) {
 
 	var input Testsuite
-
-
-
 	output := TestResults{}
-
 	// we unmarshal our byteArray which contains our
 
 	// xmlFiles content into 'users' which we defined above

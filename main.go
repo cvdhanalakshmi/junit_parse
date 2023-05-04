@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	xmlFile, err := os.Open("junit.xml")
+	xmlFile, err := os.Open("sample_response.xml")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
@@ -28,7 +28,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	result, err := util.ConvertResultJson(byteValue)
+	result, err := util.ConvertResultJsonForGitHubAction(byteValue)
 	if err != nil {
 		fmt.Println(err)
 	}
