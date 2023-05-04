@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+   <testsuite name="ReleaseIqXmlReporter" errors="0" tests="0" failures="0" time="0" timestamp="2022-09-16T10:23:58" />
+   <testsuite name="ReleaseIqXmlReporter.constructor" errors="0" skipped="0" tests="3" failures="0" time="0.006" timestamp="2022-09-16T10:23:58">
+      <testcase classname="ReleaseIqXmlReporter.constructor" name="should default path to an empty string" time="0.006">
+         <failure message="test failure">Assertion failed</failure>
+      </testcase>
+      <testcase classname="ReleaseIqXmlReporter.constructor" name="should default consolidate to true" time="0">
+      </testcase>
+      <testcase classname="ReleaseIqXmlReporter.constructor" name="should default useDotNotation to true" time="0" />
+   </testsuite>
+</testsuites>
