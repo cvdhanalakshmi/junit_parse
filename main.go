@@ -5,7 +5,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"junit_parse/util"
+	parse "github.com/cvdhanalakshmi/junit_parse"
 	"os"
 )
 
@@ -27,7 +27,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	result, err := util.ConvertResultJson(byteValue)
+	result, err := parse.ConvertResultJson(byteValue)
 	if err != nil {
 		fmt.Println(err)
 	}
