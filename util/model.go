@@ -19,10 +19,10 @@ type TestCase struct {
 	Duration        float64 `json:"duration"`
 	StartTime       int64   `json:"startTime"`
 	CompletedTime   int64   `json:"completedTime"`
-	ErrorDetails    string  `json:"errorDetails"`
-	ErrorStackTrace string  `json:"errorStackTrace"`
+	ErrorDetails    *string `json:"errorDetails"`
+	ErrorStackTrace *string `json:"errorStackTrace"`
 	Skipped         bool    `json:"skipped"`
-	SkippedMessage  string  `json:"skippedMessage"`
+	SkippedMessage  *string `json:"skippedMessage"`
 	Status          string  `json:"status"`
 	Stderr          string  `json:"stderr"`
 	Stdout          string  `json:"stdout"`
@@ -43,10 +43,10 @@ type TestsuiteInput struct {
 type TestSuite struct {
 	Cases           []TestCase `json:"cases"`
 	Duration        float64    `json:"duration"`
-	StartTime       float64    `json:"startTime"`
-	CompletedTime   float64    `json:"completedTime"`
-	ErrorDetails    string     `json:"errorDetails"`
-	ErrorStackTrace string     `json:"errorStackTrace"`
+	StartTime       int64      `json:"startTime"`
+	CompletedTime   int64      `json:"completedTime"`
+	ErrorDetails    *string    `json:"errorDetails"`
+	ErrorStackTrace *string    `json:"errorStackTrace"`
 	Id              string     `json:"id"`
 	Name            string     `json:"name"`
 	Stderr          string     `json:"stderr"`
@@ -74,6 +74,7 @@ type Testsuite struct {
 	Failures   string     `xml:"failures,attr"`
 	Testcases  []Testcase `xml:"testcase"`
 	Properties []Property `xml:"properties>property"`
+	TimeStamp  string     `xml:"timestamp,attr"`
 }
 
 type Testcase struct {

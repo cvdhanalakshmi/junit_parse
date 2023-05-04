@@ -3,14 +3,15 @@ package main
 // package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	parse "github.com/cvdhanalakshmi/junit_parse"
+	"junit_parse/util"
 	"os"
 )
 
 func main() {
-	xmlFile, err := os.Open("junit.xml")
+	xmlFile, err := os.Open("sample_response.xml")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
@@ -27,10 +28,12 @@ func main() {
 		fmt.Println(err)
 	}
 
-	result, err := parse.ConvertResultJson(byteValue)
+	result, err := util.ConvertResultJson(byteValue)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(result)
+	fmt.Printf("Result %+v", result)
+	res, _ := json.MarshalIndent(result, " ", " ")
+	fmt.Println("Json:", string(res))
 
 }

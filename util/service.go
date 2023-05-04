@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 func ConvertResultJson(byteValue []byte) (*TestResults, error) {
@@ -20,13 +21,15 @@ func ConvertResultJson(byteValue []byte) (*TestResults, error) {
 	var totalfailed, totalpassed, totalskipped int
 	for j, suiteInput := range input.TestSuite {
 		//	testsuite:=TestResult{Suites: []TestSuite{}}
+		startTime, endTime := GetStartAndEndTime(suiteInput.TimeStamp, int(suiteInput.Time))
 		newSuite := TestSuite{Cases: []TestCase{}}
 		for i, testInput := range suiteInput.Testcases {
 			var skipped bool
-			var skippedmessage string
+			var skippedmessage *string
+			testCaseStartTime, testCaseEndTime := GetStartAndEndTime(suiteInput.TimeStamp, int(testInput.Time))
 			if testInput.Skipped != nil {
 				skipped = true
-				skippedmessage = testInput.Skipped.Message
+				skippedmessage = &testInput.Skipped.Message
 			}
 			var stderr, stdout string
 			if testInput.SystemErr != nil {
@@ -35,12 +38,14 @@ func ConvertResultJson(byteValue []byte) (*TestResults, error) {
 			if testInput.SystemOut != nil {
 				stdout = testInput.SystemOut.Body
 			}
-			var errdetails, errorstacktrace string
+			var errdetails, errorstacktrace *string
 			status := "PASSED"
+			//errdetails = new(string)
+			//errorstacktrace = "null"
 
 			if testInput.Failure != nil {
-				errdetails = testInput.Failure.Body
-				errorstacktrace = testInput.Failure.Type
+				errdetails = &testInput.Failure.Body
+				errorstacktrace = &testInput.Failure.Type
 				status = "FAIL"
 			}
 
@@ -48,7 +53,8 @@ func ConvertResultJson(byteValue []byte) (*TestResults, error) {
 				ID:              fmt.Sprintf("%d", i+1),
 				Name:            testInput.Name,
 				Duration:        float64(testInput.Time),
-				StartTime:       0,
+				StartTime:       testCaseStartTime,
+				CompletedTime:   testCaseEndTime,
 				Skipped:         skipped,
 				SkippedMessage:  skippedmessage,
 				Status:          status,
@@ -71,6 +77,8 @@ func ConvertResultJson(byteValue []byte) (*TestResults, error) {
 		newSuite.Passed = tests - (skipped + failed)
 
 		newSuite.Duration = suiteInput.Time
+		newSuite.StartTime = startTime
+		newSuite.CompletedTime = endTime
 		output.TestResult.Suites = append(output.TestResult.Suites, newSuite)
 		totalfailed += failed
 		totalpassed += newSuite.Passed
@@ -90,4 +98,33 @@ func ConvertResultJson(byteValue []byte) (*TestResults, error) {
 	// 	return nil, err
 	// }
 	return &output, nil
+}
+
+func GetStartAndEndTime(timestamp string, sec int) (int64, int64) {
+	//timestampStr := "2021-04-02T15:48:23"
+
+	// Parse the timestamp string into a time.Time value
+	t, err := time.Parse("2006-01-02T15:04:05", timestamp)
+	if err != nil {
+		fmt.Println("Error parsing timestamp:", err)
+		//return
+	}
+
+	// Get the Unix timestamp
+	unixtime := t.Unix()
+	//fmt.Println(unixtime)
+	// Define the Unix timestamp
+	timest := int64(unixtime) // Unix timestamp in seconds
+
+	// Define the total duration of the test suite run in seconds
+	duration := int64(sec) // 1 hour
+
+	// Convert the Unix timestamp to a time.Time value
+	start := time.Unix(timest, 0)
+
+	// Calculate the end time by adding the duration to the start time
+	end := start.Add(time.Duration(duration) * time.Second)
+
+	return timest, end.Unix()
+
 }
