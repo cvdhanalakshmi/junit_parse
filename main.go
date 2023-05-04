@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"junit_parse/util"
+	"github.com/cvdhanalakshmi/junit_parse/util"
 	"os"
 )
 
 func main() {
-	xmlFile, err := os.Open("sample_response.xml")
+	xmlFile, err := os.Open("junit.xml")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)

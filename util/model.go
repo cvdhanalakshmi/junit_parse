@@ -4,12 +4,12 @@ import "encoding/xml"
 
 type TestResults struct {
 	TestResult TestResult `json:"testResults"`
-	Failed     int        `json:"failed"`
-	Passed     int        `json:"passed"`
-	Skipped    int        `json:"skipped"`
 }
 type TestResult struct {
-	Suites []TestSuite `json:"suites"`
+	Suites  []TestSuite `json:"suites"`
+	Failed  int         `json:"failed"`
+	Passed  int         `json:"passed"`
+	Skipped int         `json:"skipped"`
 }
 
 // JSON Structs

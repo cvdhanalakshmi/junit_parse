@@ -84,9 +84,9 @@ func ConvertResultJson(byteValue []byte) (*TestResults, error) {
 		totalpassed += newSuite.Passed
 		totalskipped += skipped
 	}
-	output.Failed = totalfailed
-	output.Passed = totalpassed
-	output.Skipped = totalskipped
+	output.TestResult.Failed = totalfailed
+	output.TestResult.Passed = totalpassed
+	output.TestResult.Skipped = totalskipped
 	// res, err := json.Marshal(output)
 	// fmt.Println(output)
 	// if err != nil {
@@ -126,5 +126,137 @@ func GetStartAndEndTime(timestamp string, sec int) (int64, int64) {
 	end := start.Add(time.Duration(duration) * time.Second)
 
 	return timest, end.Unix()
+
+}
+
+func ConvertResultJsonForGitHubAction(byteValue []byte) (*TestResults, error) {
+
+	var input Testsuite
+
+
+
+	output := TestResults{}
+
+	// we unmarshal our byteArray which contains our
+
+	// xmlFiles content into 'users' which we defined above
+
+	err := xml.Unmarshal(byteValue, &input)
+
+	if err != nil {
+
+		return nil, err
+
+	}
+
+	var startTime, endTime int64
+
+	newSuite := TestSuite{Cases: []TestCase{}}
+
+	for i, testInput := range input.Testcases {
+
+		var skipped bool
+
+		var skippedmessage *string
+
+		var testCaseStartTime, testCaseEndTime int64 //:= GetStartAndEndTime(suiteInput.TimeStamp, int(testInput.Time))
+
+		if testInput.Skipped != nil {
+
+			skipped = true
+
+			skippedmessage = &testInput.Skipped.Message
+
+		}
+
+		var stderr, stdout string
+
+		if testInput.SystemErr != nil {
+
+			stderr = testInput.SystemErr.Body
+
+		}
+
+		if testInput.SystemOut != nil {
+
+			stdout = testInput.SystemOut.Body
+
+		}
+
+		var errdetails, errorstacktrace *string
+
+		status := "PASSED"
+
+		if testInput.Failure != nil {
+
+			errdetails = &testInput.Failure.Body
+
+			errorstacktrace = &testInput.Failure.Type
+
+			status = "FAIL"
+
+		}
+
+		caseStruct := TestCase{
+
+			ID: fmt.Sprintf("%d", i+1),
+
+			Name: testInput.Name,
+
+			Duration: float64(testInput.Time),
+
+			StartTime: testCaseStartTime,
+
+			CompletedTime: testCaseEndTime,
+
+			Skipped: skipped,
+
+			SkippedMessage: skippedmessage,
+
+			Status: status,
+
+			ErrorDetails: errdetails,
+
+			ErrorStackTrace: errorstacktrace,
+
+			Stderr: stderr,
+
+			Stdout: stdout,
+		}
+
+		newSuite.Cases = append(newSuite.Cases, caseStruct)
+
+	}
+
+	newSuite.Name = input.Name
+
+	newSuite.Id = fmt.Sprintf("%d", 1)
+
+	newSuite.Name = input.Name
+
+	failed, _ := strconv.Atoi(input.Failures)
+
+	newSuite.Failed = failed
+
+	skipped, _ := strconv.Atoi(input.Skipped)
+
+	newSuite.Skipped = skipped
+
+	tests, _ := strconv.Atoi(input.Tests)
+
+	newSuite.Passed = tests - (skipped + failed)
+
+	newSuite.Duration = input.Time
+
+	newSuite.StartTime = startTime
+
+	newSuite.CompletedTime = endTime
+
+	output.TestResult.Suites = append(output.TestResult.Suites, newSuite)
+	output.TestResult.Failed = failed
+	output.TestResult.Passed = newSuite.Passed
+	output.TestResult.Skipped = skipped
+
+	return &output, nil
 
 }
